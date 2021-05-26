@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const postRoute = require("./Routes/Post");
 const cors = require("cors");
 require("dotenv/config");
-const port = 4000;
+const port = process.env.PORT || 4000;
 //Connect to db
 mongoose
   .connect(process.env.DB_CONNECTION, {
