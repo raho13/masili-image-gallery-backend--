@@ -21,9 +21,10 @@ cloudinary.config({
   api_key: process.env.API_KEY,
   api_secret: process.env.API_SECRET,
 });
-router.get("/", (req, res) => {
+// GET ALL POST
+router.get("/", async (req, res) => {
   try {
-    Post.find({}, (err, data) => {
+    await Post.find({}, (err, data) => {
       if (err) throw new Error("Something went wrong");
       res.json({ posts: data });
     });
@@ -31,26 +32,58 @@ router.get("/", (req, res) => {
     res.json({ error: err.message });
   }
 });
-router.post("/", async (req, res) => {
+// ADD POST
+router.post("/add", async (req, res) => {
   try {
+    // add to cloudinary
     const fileStr = req.body.data;
     const uploadResponse = await cloudinary.uploader.upload(fileStr, {
       upload_preset: "ml_default",
       folder: "masiliImages/images/",
       public_id: new Date().toISOString(),
     });
-    const post = new Post({
+    console.log(uploadResponse);
+    //add to db
+    const post = await new Post({
       image: uploadResponse.url,
       title: req.body.title,
       description: req.body.description,
       category: req.body.category,
+      image_id: uploadResponse.public_id,
     });
     post.save().then((data) => res.json(data));
-
-    // res.json({ msg: "yaya" });
+    // res.json(post);
   } catch (err) {
     console.error(err);
     res.status(500).json({ err: "Something went wrong" });
+  }
+});
+// UPDATE POST
+router.post("/update/:postID", async (req, res) => {
+  try {
+    const updatePost = await Post.updateOne(
+      { _id: req.params.postID },
+      { $set: { title: req.body.title, description: req.body.description } }
+    );
+    res.json(updatePost);
+  } catch (err) {
+    res.json({ message: err });
+  }
+});
+// DELETE POST
+router.post("/delete/:postID", async (req, res) => {
+  try {
+    const deleteimage = await cloudinary.uploader.destroy(
+      req.body.image_id,
+      (result) => {
+        console.log(result);
+      }
+    );
+    //  res.json(deleteimage);
+    const removepost = await Post.deleteOne({ _id: req.params.postID });
+    res.json(removepost);
+  } catch (err) {
+    res.json({ message: err });
   }
 });
 
