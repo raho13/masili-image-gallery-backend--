@@ -5,7 +5,7 @@ const postRoute = require("./Routes/Post");
 const cors = require("cors");
 require("dotenv/config");
 const port = process.env.PORT || 4000;
-//Connect to db
+//Connect to db 
 mongoose
   .connect(process.env.DB_CONNECTION, {
     useNewUrlParser: true,
