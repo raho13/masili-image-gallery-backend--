@@ -22,7 +22,7 @@ cloudinary.config({
   api_secret: process.env.API_SECRET,
 });
 // GET ALL POST
-router.get("/", async (req, res) => {
+router.get("/all", async (req, res) => {
   try {
     await Post.find({}, (err, data) => {
       if (err) throw new Error("Something went wrong");
@@ -52,6 +52,7 @@ router.post("/add", async (req, res) => {
       image_id: uploadResponse.public_id,
     });
     post.save().then((data) => res.json(data));
+    
     // res.json(post);
   } catch (err) {
     console.error(err);
@@ -72,11 +73,12 @@ router.post("/update/:postID", async (req, res) => {
 });
 // DELETE POST
 router.post("/delete/:postID", async (req, res) => {
+  console.log(req.params.postID, "bu");
   try {
     const deleteimage = await cloudinary.uploader.destroy(
       req.body.image_id,
       (result) => {
-        console.log(result);
+        return;
       }
     );
     //  res.json(deleteimage);
