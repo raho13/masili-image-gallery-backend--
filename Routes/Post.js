@@ -2,11 +2,9 @@ const express = require("express");
 const Post = require("../Models/Post");
 const router = express.Router();
 require("dotenv/config");
-const axios = require("axios");
 const cloudinary = require("cloudinary").v2;
 const Posts = require("../Models/Post");
 const multer = require("multer");
-
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "uploads/");
@@ -52,7 +50,7 @@ router.post("/add", async (req, res) => {
       image_id: uploadResponse.public_id,
     });
     post.save().then((data) => res.json(data));
-    
+
     // res.json(post);
   } catch (err) {
     console.error(err);
