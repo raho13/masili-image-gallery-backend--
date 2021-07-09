@@ -1,5 +1,6 @@
 const express = require("express");
 const Post = require("../Models/Post");
+const auth = require("../Middlewares/Auth");
 const router = express.Router();
 require("dotenv/config");
 const cloudinary = require("cloudinary").v2;
@@ -31,7 +32,7 @@ router.get("/all", async (req, res) => {
   }
 });
 // ADD POST
-router.post("/add", async (req, res) => {
+router.post("/add", auth, async (req, res) => {
   try {
     // add to cloudinary
     const fileStr = req.body.data;
@@ -58,7 +59,7 @@ router.post("/add", async (req, res) => {
   }
 });
 // UPDATE POST
-router.post("/update/:postID", async (req, res) => {
+router.post("/update/:postID", auth, async (req, res) => {
   try {
     const updatePost = await Post.updateOne(
       { _id: req.params.postID },
@@ -70,7 +71,7 @@ router.post("/update/:postID", async (req, res) => {
   }
 });
 // DELETE POST
-router.post("/delete/:postID", async (req, res) => {
+router.post("/delete/:postID", auth, async (req, res) => {
   console.log(req.params.postID, "bu");
   try {
     const deleteimage = await cloudinary.uploader.destroy(

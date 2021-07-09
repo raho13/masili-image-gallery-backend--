@@ -25,7 +25,7 @@ app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(express.json());
 app.use(cors());
-app.use("/post", auth, postRoute);
+app.use("/post", postRoute);
 app.use("/register", registerRoute);
 app.use("/login", loginRoute);
 app.use("/profile", auth, profileRoute);
