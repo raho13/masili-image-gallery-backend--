@@ -30,7 +30,7 @@ app.use("/register", registerRoute);
 app.use("/login", loginRoute);
 app.use("/profile", auth, profileRoute);
 app.use("/", (req, res) => {
-  res.send("<h1>Mgallery</h1>");
+  res.send("<h1>Mgallery API</h1>");
 });
 
 app.listen(port);
