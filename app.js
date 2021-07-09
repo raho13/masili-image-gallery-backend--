@@ -6,9 +6,15 @@ const registerRoute = require("./Routes/Register");
 const loginRoute = require("./Routes/Login");
 const profileRoute = require("./Routes/Profile");
 const cors = require("cors");
+const cloudinary = require("cloudinary").v2;
 const auth = require("./Middlewares/Auth");
 require("dotenv/config");
 const port = process.env.PORT || 4000;
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET,
+});
 //Connect to db
 mongoose
   .connect(process.env.DB_CONNECTION, {

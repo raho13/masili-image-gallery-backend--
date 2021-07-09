@@ -5,21 +5,7 @@ const router = express.Router();
 require("dotenv/config");
 const cloudinary = require("cloudinary").v2;
 const Posts = require("../Models/Post");
-const multer = require("multer");
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/");
-  },
-  filename: function (req, file, cb) {
-    cb(null, file.originalname);
-  },
-});
 
-cloudinary.config({
-  cloud_name: process.env.CLOUD_NAME,
-  api_key: process.env.API_KEY,
-  api_secret: process.env.API_SECRET,
-});
 // GET ALL POST
 router.get("/all", async (req, res) => {
   try {
@@ -41,7 +27,6 @@ router.post("/add", auth, async (req, res) => {
       folder: "masiliImages/images/",
       public_id: new Date().toISOString(),
     });
-    console.log(uploadResponse);
     //add to db
     const post = await new Post({
       image: uploadResponse.url,
@@ -72,7 +57,6 @@ router.post("/update/:postID", auth, async (req, res) => {
 });
 // DELETE POST
 router.post("/delete/:postID", auth, async (req, res) => {
-  console.log(req.params.postID, "bu");
   try {
     const deleteimage = await cloudinary.uploader.destroy(
       req.body.image_id,
