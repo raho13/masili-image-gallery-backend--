@@ -20,7 +20,7 @@ router.post("/", async (req, res) => {
       req.body.old_password,
       user.password
     );
-    if (true) {
+    if (validPassword) {
       //With password update
       if (req.body.new_password) {
         const salt = await bcrypt.genSalt(10);
@@ -70,7 +70,7 @@ router.post("/image", async (req, res) => {
       user.password
     );
 
-    if (true) {
+    if (validPassword) {
       if (!(req.body.old_img_id === "")) {
         const deleteimage = await cloudinary.uploader.destroy(
           req.body.old_img_id,
