@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const server=require('http').createServer(app)
 const mongoose = require("mongoose");
 const postRoute = require("./Routes/Post");
 const registerRoute = require("./Routes/Register");
@@ -8,8 +9,11 @@ const profileRoute = require("./Routes/Profile");
 const cors = require("cors");
 const cloudinary = require("cloudinary").v2;
 const auth = require("./Middlewares/Auth");
+const io = require("socket.io")(server,{cors:{origin: "*"}});
 require("dotenv/config");
 const port = process.env.PORT || 4000;
+
+
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.API_KEY,
@@ -19,9 +23,10 @@ cloudinary.config({
 mongoose
   .connect(process.env.DB_CONNECTION, {
     useNewUrlParser: true,
+    useUnifiedTopology: true,
   })
   .then(() => {
-    console.log("**CONNECTED**", "runing in port", port);
+    console.log("CONNECTED to DB.");
   })
   .catch(() => {
     console.log("CONNETION ERROR");
@@ -43,4 +48,16 @@ app.use("/", (req, res) => {
   res.send("<h1>Mgallery API</h1>");
 });
 
-app.listen(port);
+ server.listen(port,()=>{
+  console.log( "runing in http://localhost:"+ port)
+});
+
+io.on('connection', (socket) => {
+  console.log('CONNECTED',socket.id);
+
+socket.on('test',data=>{
+  io.sockets.emit('test',data)
+})
+
+});
+

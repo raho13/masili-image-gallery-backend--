@@ -9,7 +9,7 @@ module.exports = function (req, res, next) {
       req.user = verified;
       next();
     } catch (err) {
-      res.send("Invalid Token").status(401);
+      res.status(401).send("Invalid Token");
     }
   }
 };

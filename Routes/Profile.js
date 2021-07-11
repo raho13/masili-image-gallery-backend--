@@ -7,9 +7,12 @@ const router = express.Router();
 router.get("/", async (req, res) => {
   try {
     const user = await User.findOne({ _id: req.user._id });
+    if(!user){
+      throw new Error('user not found')
+    }
     res.json(user);
   } catch (err) {
-    res.json({ error: err.message });
+    res.status(401).json({ error: err.message });
   }
 });
 //Update personal data
