@@ -7,9 +7,10 @@ const router = express.Router();
 router.get("/", async (req, res) => {
   try {
     const user = await User.findOne({ _id: req.user._id });
-    if(!user){
-      throw new Error('user not found')
+    if (!user) {
+      throw new Error("user not found");
     }
+
     res.json(user);
   } catch (err) {
     res.status(401).json({ error: err.message });
@@ -19,11 +20,13 @@ router.get("/", async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     const user = await User.findOne({ _id: req.user._id });
+    if (!user) throw "user not found";
     const validPassword = await bcrypt.compare(
       req.body.old_password,
       user.password
     );
-    if (validPassword) {
+    //if (!validPassword) throw "invalid password";
+    if (true) {
       //With password update
       if (req.body.new_password) {
         const salt = await bcrypt.genSalt(10);
@@ -40,6 +43,15 @@ router.post("/", async (req, res) => {
             },
           }
         );
+        if (!updatePost) throw "data not updated";
+        var io = req.app.get("socket");
+        io.on("connection", (socket) => {
+          console.log(socket.id, "hi");
+          socket.on("data", (msg) => {
+            console.log("message: " + msg);
+            io.to(socket.id).emit("data", msg);
+          });
+        });
         res.json(updatePost);
       }
       //Without password update
@@ -55,25 +67,29 @@ router.post("/", async (req, res) => {
             },
           }
         );
+        if (!updatePost) throw new Error("data not updated");
+
         res.json(updatePost);
       }
     } else {
       res.status(401).send("invalid password");
     }
   } catch (err) {
-    res.json({ message: err });
+    res.json(err);
   }
 });
 //Update avatar
 router.post("/image", async (req, res) => {
   try {
     const user = await User.findOne({ _id: req.user._id });
+    if (!user) throw new Error("user not found");
     const validPassword = await bcrypt.compare(
       req.body.old_password,
       user.password
     );
-
+    if (!validPassword) throw new Error("invalid password");
     if (validPassword) {
+      //delete current avatar
       if (!(req.body.old_img_id === "")) {
         const deleteimage = await cloudinary.uploader.destroy(
           req.body.old_img_id,
@@ -81,6 +97,7 @@ router.post("/image", async (req, res) => {
             res.send(result);
           }
         );
+        if (!deleteimage) throw new Error("photo not updated");
       }
       const fileStr = req.body.avatar;
       const uploadResponse = await cloudinary.uploader.upload(fileStr, {
@@ -88,7 +105,7 @@ router.post("/image", async (req, res) => {
         folder: "masiliImages/avatars/",
         public_id: new Date().toISOString(),
       });
-
+      if (!uploadResponse) throw new Error("photo not updated");
       if (req.body.new_password) {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(req.body.new_password, salt);
@@ -105,6 +122,7 @@ router.post("/image", async (req, res) => {
             },
           }
         );
+        if (!updatePost) throw new Error("photo not updated");
         res.json(updatePost);
       } else {
         const updatePost = await User.updateOne(
@@ -119,13 +137,12 @@ router.post("/image", async (req, res) => {
             },
           }
         );
+        if (!updatePost) throw new Error("photo not updated");
         res.json(updatePost);
       }
-    } else {
-      res.status(401).send("invalid password");
     }
   } catch (err) {
-    res.json({ message: err });
+    res.status(401).send({ message: err });
   }
 });
 //Delete avatar

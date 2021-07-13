@@ -8,6 +8,10 @@ const Posts = require("../Models/Post");
 
 // GET ALL POST
 router.get("/all", async (req, res) => {
+  // var io = req.app.get("socket");
+  // io.on("connection", (socket) => {
+  //   console.log(socket.id, "salaaam");
+  // });
   try {
     await Post.find({}, (err, data) => {
       if (err) throw new Error("Something went wrong");
